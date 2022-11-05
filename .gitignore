@@ -1,5 +1,6 @@
 HELP.md
 env.properties
+data.sql
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
