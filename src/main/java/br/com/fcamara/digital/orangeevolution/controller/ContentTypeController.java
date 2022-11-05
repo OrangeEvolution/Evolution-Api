@@ -1,7 +1,7 @@
 package br.com.fcamara.digital.orangeevolution.controller;
 
-import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
-import br.com.fcamara.digital.orangeevolution.services.TrailServices;
+import br.com.fcamara.digital.orangeevolution.data.vo.ContentTypeVO;
+import br.com.fcamara.digital.orangeevolution.services.ContentTypeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,28 +17,27 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/api/trails")
-public class TrailController {
-
+@RequestMapping("/api/content-type")
+public class ContentTypeController {
     @Autowired
-    private TrailServices services;
+    private ContentTypeServices services;
 
     @PostMapping
-    public TrailVO create(@RequestBody TrailVO trail) {
-        TrailVO trailVO = services.create(trail);
-        trailVO.add(linkTo(methodOn(TrailController.class).findById(trailVO.getKey())).withSelfRel());
-        return trailVO;
+    public ContentTypeVO create(@RequestBody ContentTypeVO type) {
+        ContentTypeVO typeVO = services.create(type);
+        typeVO.add(linkTo(methodOn(ContentTypeController.class).findById(typeVO.getKey())).withSelfRel());
+        return typeVO;
     }
 
     @GetMapping(value = "/{id}")
-    public TrailVO findById(@PathVariable(value = "id") Long id) {
-        TrailVO trailVO = services.findById(id);
-        trailVO.add(linkTo(methodOn(TrailController.class).findById(trailVO.getKey())).withSelfRel());
-        return trailVO;
+    public ContentTypeVO findById(@PathVariable(value = "id") Long id) {
+        ContentTypeVO typeVO = services.findById(id);
+        typeVO.add(linkTo(methodOn(ContentTypeController.class).findById(typeVO.getKey())).withSelfRel());
+        return typeVO;
     }
 
     @GetMapping
-    public ResponseEntity<PagedModel<TrailVO>> findAll(
+    public ResponseEntity<PagedModel<ContentTypeVO>> findAll(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "limit", defaultValue = "12") int limit,
             @RequestParam(value = "direction", defaultValue = "asc") String direction,
@@ -46,16 +45,16 @@ public class TrailController {
 
         var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, limit, Sort.by(sortDirection, "name"));
-        Page<TrailVO> trails = services.findAll(pageable);
-        trails.stream().forEach(s -> s.add(linkTo(methodOn(TrailController.class).findById(s.getKey())).withSelfRel()));
-        return new ResponseEntity<>(assembler.toModel(trails), HttpStatus.OK);
+        Page<ContentTypeVO> typesVO = services.findAll(pageable);
+        typesVO.stream().forEach(s -> s.add(linkTo(methodOn(ContentTypeController.class).findById(s.getKey())).withSelfRel()));
+        return new ResponseEntity<>(assembler.toModel(typesVO), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}")
-    public TrailVO update(@RequestBody TrailVO trail) {
-        TrailVO trailVO = services.update(trail);
-        trailVO.add(linkTo(methodOn(TrailController.class).findById(trailVO.getKey())).withSelfRel());
-        return trailVO;
+    public ContentTypeVO update(@RequestBody ContentTypeVO type) {
+        ContentTypeVO typeVO = services.update(type);
+        typeVO.add(linkTo(methodOn(ContentTypeController.class).findById(typeVO.getKey())).withSelfRel());
+        return typeVO;
     }
 
     @DeleteMapping(value = "/{id}")
