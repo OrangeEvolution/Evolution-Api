@@ -24,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
 import br.com.fcamara.digital.orangeevolution.services.CategoryServices;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Category Endpoint")
 @RestController
 @RequestMapping("/api/category")
 public class CategoryController {
@@ -32,6 +35,7 @@ public class CategoryController {
 	@Autowired
 	private CategoryServices services;
 
+	@Operation(summary= "Create new category")
 	@PostMapping
 	public CategoryVO create(@RequestBody CategoryVO category) {
 		CategoryVO categoryVO = services.create(category);
@@ -39,6 +43,7 @@ public class CategoryController {
 		return categoryVO;
 	}
 
+	@Operation(summary = "Find a specific by you ID")
 	@GetMapping(value = "/{id}")
 	public CategoryVO findById(@PathVariable(value = "id") Long id) {
 		CategoryVO categoryVO = services.findById(id);
@@ -47,6 +52,7 @@ public class CategoryController {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Operation(summary = "Find all categories")
 	@GetMapping
 	public ResponseEntity<PagedModel<CategoryVO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "limit", defaultValue = "12") int limit,
@@ -61,6 +67,7 @@ public class CategoryController {
 		return new ResponseEntity<>(assembler.toModel(categoryVO), HttpStatus.OK);
 	}
 
+	@Operation(summary = "Update specific category by your ID")
 	@PutMapping(value = "/{id}")
 	public CategoryVO update(@RequestBody CategoryVO type) {
 		CategoryVO categoryVO = services.update(type);
@@ -68,6 +75,7 @@ public class CategoryController {
 		return categoryVO;
 	}
 
+	@Operation(summary = "Delete specific Category by your ID")
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<?> delete(@PathVariable(value = "id") Long id) {
 		services.delete(id);

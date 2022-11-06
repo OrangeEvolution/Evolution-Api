@@ -25,13 +25,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.fcamara.digital.orangeevolution.data.vo.UserVO;
 import br.com.fcamara.digital.orangeevolution.services.UserServices;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "User Endpoint")
 @RestController
 @RequestMapping("api/user")
 public class UserController {
 	@Autowired
 	private UserServices services;
 
+	@Operation(summary = "Create new user")
 	@PostMapping
 	public UserVO create(@RequestBody UserVO user) {
 		UserVO userVO = services.create(user);
@@ -40,6 +44,7 @@ public class UserController {
 
 	}
 
+	@Operation(summary = "Find a specific by you ID")
 	@GetMapping(value = "/{id}")
 	public UserVO findById(@PathVariable(value = "id") Long id) {
 		UserVO userVO = services.findById(id);
@@ -48,6 +53,7 @@ public class UserController {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Operation(summary = "Find all users")
 	@GetMapping
 	public ResponseEntity<PagedModel<UserVO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "limit", defaultValue = "12") int limit,
@@ -61,6 +67,7 @@ public class UserController {
 		return new ResponseEntity<>(assembler.toModel(users), HttpStatus.OK);
 	}
 
+	@Operation(summary = "Update specific user by your ID")
 	@PutMapping
 	public UserVO update(@RequestBody UserVO user) {
 		UserVO userVO = services.update(user);
@@ -68,6 +75,7 @@ public class UserController {
 		return userVO;
 	}
 
+	@Operation(summary = "Delete specific user by your ID")
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<?> delete(@PathVariable(value = "id") Long id) {
 		services.delete(id);

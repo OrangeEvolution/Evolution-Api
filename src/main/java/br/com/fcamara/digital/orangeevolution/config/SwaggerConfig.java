@@ -1,32 +1,33 @@
 package br.com.fcamara.digital.orangeevolution.config;
 
-import java.util.Collections;
-
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfig {
 	@Bean
-	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2).select()
-				.apis(RequestHandlerSelectors.basePackage("br.com.fcamara.digital.orangeevolution"))
-				.paths(PathSelectors.any()).build().apiInfo(apiInfo());
+	public GroupedOpenApi publicApi() {
+		return GroupedOpenApi.builder().group("br.com.fcamara.digital.orangeevolution").pathsToMatch("/**").build();
 	}
 
-	private ApiInfo apiInfo() {
-		return new ApiInfo("Hackathon do Programa de Formação do Grupo FCamara", "API Orange Evolution", "V1",
-				"terms of service url",
-				new Contact("Squad 25", "https://github.com/OrangeEvolution", "email@email.com"), "License of API",
-				"License of URL", Collections.emptyList());
+	@Bean
+	public OpenAPI orangeEvolutionpenAPI() {
+		return new OpenAPI()
+				.info(new Info().title("API Orange Evolution")
+						.description("Hackathon do Programa de Formação do Grupo FCamara").version("v0.0.1")
+						.license(new License().name("Apache 2.0").url("http://springdoc.org")))
+				.externalDocs(new ExternalDocumentation().description("SpringShop Wiki Documentation")
+						.url("https://springshop.wiki.github.org/docs"))
+				.components(new Components().addSecuritySchemes("bearer_token",
+						new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer")
+								.in(SecurityScheme.In.HEADER).bearerFormat("JWT")));
 	}
 }

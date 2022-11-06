@@ -20,7 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fcamara.digital.orangeevolution.security.AccountCredentialsVO;
 import br.com.fcamara.digital.orangeevolution.security.jwt.JwtTokenProvider;
 import br.com.fcamara.digital.orangeevolution.services.UserServices;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Auth Endpoint")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -35,6 +38,7 @@ public class AuthController {
 	private UserServices userServices;
 
 	@SuppressWarnings("rawtypes")
+	@Operation(summary = "Authentication a user and return a token")
 	@PostMapping(value = "/signin")
 	public ResponseEntity signin(@RequestBody AccountCredentialsVO data) {
 		try {
