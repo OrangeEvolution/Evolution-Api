@@ -12,7 +12,7 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
-public class SwaggerConfig {
+public class DocumentationConfig {
 	@Bean
 	public GroupedOpenApi publicApi() {
 		return GroupedOpenApi.builder().group("br.com.fcamara.digital.orangeevolution").pathsToMatch("/**").build();
