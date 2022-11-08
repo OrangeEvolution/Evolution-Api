@@ -1,6 +1,8 @@
 package br.com.fcamara.digital.orangeevolution.data.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.hateoas.RepresentationModel;
 
@@ -23,5 +25,6 @@ public class UserVO extends RepresentationModel<UserVO> implements Serializable 
 	private String userName;
 	private String fullName;
 	private String password;
+	private List<TrailVO> trails = new ArrayList<>();
 
 }

@@ -1,14 +1,15 @@
 package br.com.fcamara.digital.orangeevolution.data.vo;
 
+import java.io.Serializable;
+
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.RepresentationModel;
-
-import javax.persistence.Column;
-import java.io.Serializable;
 
 @Data
 @NoArgsConstructor

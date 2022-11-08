@@ -12,9 +12,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.UserVO;
 import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
 import br.com.fcamara.digital.orangeevolution.model.Permission;
+import br.com.fcamara.digital.orangeevolution.model.Trail;
 import br.com.fcamara.digital.orangeevolution.model.User;
 import br.com.fcamara.digital.orangeevolution.repository.PermissionRepository;
 import br.com.fcamara.digital.orangeevolution.repository.UserRepository;
@@ -33,14 +35,28 @@ public class UserServices implements UserDetailsService {
 	}
 
 	private User toConvert(UserVO userVO) {
-		User user = new User(userVO.getKey(), userVO.getUserName(), userVO.getFullName(), userVO.getPassword(), true,
-				true, true, true, null);
+		List<Trail> trails = new ArrayList<>();
+		User user = new User(userVO.getKey(), userVO.getUserName(), userVO.getFullName(), userVO.getPassword(), trails,
+				true, true, true, true, null);
+		for (TrailVO trailVO : userVO.getTrails()) {
+			Trail trail = new Trail(trailVO.getKey(), trailVO.getName(), trailVO.getDescription(),
+					trailVO.getMounted_by());
+			trails.add(trail);
 
+		}
+		user.setTrails(trails);
 		return user;
 	}
 
 	private UserVO toConvert(User user) {
-		UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getFullName(), user.getPassword());
+		List<TrailVO> trails = new ArrayList<>();
+		UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getFullName(), user.getPassword(), trails);
+		for (Trail trail : user.getTrails()) {
+			TrailVO trailVO = new TrailVO(trail.getId(), trail.getName(), trail.getDescription(),
+					trail.getMounted_by());
+			trails.add(trailVO);
+		}
+		userVO.setTrails(trails);
 		return userVO;
 
 	}
