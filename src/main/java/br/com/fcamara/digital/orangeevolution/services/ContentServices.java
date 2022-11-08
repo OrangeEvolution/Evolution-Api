@@ -3,6 +3,7 @@ package br.com.fcamara.digital.orangeevolution.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentVO;
 import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import br.com.fcamara.digital.orangeevolution.model.Content;
 import br.com.fcamara.digital.orangeevolution.model.ContentType;
 import br.com.fcamara.digital.orangeevolution.repository.ContentRepository;
 
+@Service
 public class ContentServices {
 
 	@Autowired
