@@ -12,9 +12,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.UserVO;
 import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
+import br.com.fcamara.digital.orangeevolution.model.Category;
 import br.com.fcamara.digital.orangeevolution.model.Permission;
 import br.com.fcamara.digital.orangeevolution.model.Trail;
 import br.com.fcamara.digital.orangeevolution.model.User;
@@ -39,8 +41,13 @@ public class UserServices implements UserDetailsService {
 		User user = new User(userVO.getKey(), userVO.getUserName(), userVO.getFullName(), userVO.getPassword(), trails,
 				true, true, true, true, null);
 		for (TrailVO trailVO : userVO.getTrails()) {
+			List<Category> categories = new ArrayList<>();
+			for (CategoryVO categoryVO : trailVO.getCategories()) {
+				Category category = new Category(categoryVO.getKey(), categoryVO.getName());
+				categories.add(category);
+			}
 			Trail trail = new Trail(trailVO.getKey(), trailVO.getName(), trailVO.getDescription(),
-					trailVO.getMounted_by());
+					trailVO.getMounted_by(), categories);
 			trails.add(trail);
 
 		}
@@ -52,8 +59,13 @@ public class UserServices implements UserDetailsService {
 		List<TrailVO> trails = new ArrayList<>();
 		UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getFullName(), user.getPassword(), trails);
 		for (Trail trail : user.getTrails()) {
-			TrailVO trailVO = new TrailVO(trail.getId(), trail.getName(), trail.getDescription(),
-					trail.getMounted_by());
+			List<CategoryVO> categories = new ArrayList<>();
+			for (Category category : trail.getCategories()) {
+				CategoryVO categoryVO = CategoryVO.builder().key(category.getId()).name(category.getName()).build();
+				categories.add(categoryVO);
+			}
+			TrailVO trailVO = new TrailVO(trail.getId(), trail.getName(), trail.getDescription(), trail.getMounted_by(),
+					categories);
 			trails.add(trailVO);
 		}
 		userVO.setTrails(trails);

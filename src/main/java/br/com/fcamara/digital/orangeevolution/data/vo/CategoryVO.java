@@ -16,7 +16,6 @@ public class CategoryVO extends RepresentationModel<CategoryVO> implements Seria
 	private static final long serialVersionUID = 1L;
 	@JsonProperty("id")
 	private Long key;
-	private Long trail;
 	private String name;
 
 }

@@ -46,9 +46,9 @@ public class TrailServices {
     }
 
     public TrailVO findById(Long id) {
-        return toConvert(
-                repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trail not found"))
-        );
+    	var teste = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
+        System.out.println(teste);
+    	return toConvert(teste);
     }
 
     public Page<TrailVO> findAll(Pageable pageable) {

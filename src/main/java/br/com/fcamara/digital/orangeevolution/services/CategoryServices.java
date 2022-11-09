@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
 import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
 import br.com.fcamara.digital.orangeevolution.model.Category;
-import br.com.fcamara.digital.orangeevolution.model.Trail;
 import br.com.fcamara.digital.orangeevolution.repository.CategoryRepository;
 
 @Service
@@ -53,13 +52,12 @@ public class CategoryServices {
 	}
 
 	private Category toConvert(CategoryVO categoryVO) {
-		Trail newTrail = new Trail();
-		newTrail.setId(categoryVO.getTrail());
-		return Category.builder().id(categoryVO.getKey()).trail(newTrail).name(categoryVO.getName()).build();
+		
+		return Category.builder().id(categoryVO.getKey()).name(categoryVO.getName()).build();
 	}
 
 	private CategoryVO toConvert(Category category) {
-		return CategoryVO.builder().key(category.getId()).trail(category.getTrail().getId()).name(category.getName()).build();
+		return CategoryVO.builder().key(category.getId()).name(category.getName()).build();
 	}
 
 }

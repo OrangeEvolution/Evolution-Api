@@ -1,6 +1,8 @@
 package br.com.fcamara.digital.orangeevolution.data.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.hateoas.RepresentationModel;
 
@@ -23,4 +25,6 @@ public class TrailVO extends RepresentationModel<TrailVO> implements Serializabl
     private String name;
     private String description;
     private String mounted_by;
+	private List<CategoryVO> categories = new ArrayList<>();
+
 }
