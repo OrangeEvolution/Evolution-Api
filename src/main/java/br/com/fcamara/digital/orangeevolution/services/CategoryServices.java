@@ -59,7 +59,7 @@ public class CategoryServices {
 	}
 
 	private CategoryVO toConvert(Category category) {
-		return CategoryVO.builder().key(category.getId()).trail(category.getId()).name(category.getName()).build();
+		return CategoryVO.builder().key(category.getId()).trail(category.getTrail().getId()).name(category.getName()).build();
 	}
 
 }

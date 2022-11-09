@@ -20,6 +20,7 @@ public class ContentServices {
 
 	public ContentVO create(ContentVO contentVO) {
 		Content content = toConvert(contentVO);
+		System.out.println(content);
 		contentVO = toConvert(repository.save(content));
 
 		return contentVO;
@@ -59,7 +60,7 @@ public class ContentServices {
 		Category category = new Category();
 		category.setId(contentVO.getCategory());
 		ContentType contentType = new ContentType();
-		contentType.setId(contentVO.getKey());
+		contentType.setId(contentVO.getContentType());
 
 		return Content.builder().id(contentVO.getKey()).description(contentVO.getDescription())
 				.link(contentVO.getLink()).partner(contentVO.getPartner())
