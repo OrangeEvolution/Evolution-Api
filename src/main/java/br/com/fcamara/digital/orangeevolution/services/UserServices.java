@@ -31,8 +31,8 @@ public class UserServices implements UserDetailsService {
 	@Autowired
 	PermissionRepository repositoryPermission;
 
-	private UserVO convertToUserVO(User card) {
-		return toConvert(card);
+	private UserVO convertToUserVO(User user) {
+		return toConvert(user);
 
 	}
 
@@ -107,6 +107,13 @@ public class UserServices implements UserDetailsService {
 		var vo = toConvert(repository.save(entity));
 		return vo;
 	}
+	public UserVO addTrailToUser(UserVO user) {
+		var entity = repository.findById(user.getKey())
+				.orElseThrow(() -> new ResourceNotFoundException("Not records found for thins ID"));
+		entity.setTrails(toConvert(user).getTrails());
+		var vo = toConvert(repository.save(entity));
+		return vo;
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -120,5 +127,8 @@ public class UserServices implements UserDetailsService {
 
 	public User findUser(String username) {
 		return repository.findByUsername(username);
+	}
+	public UserVO findUserVO(String username) {
+		return toConvert(repository.findByUsername(username));
 	}
 }

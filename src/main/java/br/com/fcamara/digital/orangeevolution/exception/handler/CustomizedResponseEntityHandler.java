@@ -11,6 +11,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import br.com.fcamara.digital.orangeevolution.exception.ExceptionResponse;
+import br.com.fcamara.digital.orangeevolution.exception.InvalidInputException;
 import br.com.fcamara.digital.orangeevolution.exception.InvalidJwtAuthenticationException;
 import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
 
@@ -34,6 +35,12 @@ public class CustomizedResponseEntityHandler extends ResponseEntityExceptionHand
 
 	@ExceptionHandler(InvalidJwtAuthenticationException.class)
 	public final ResponseEntity<ExceptionResponse> invalidJwtAuthenticationException(Exception ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
+				request.getDescription(false));
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+	}
+	@ExceptionHandler(InvalidInputException.class)
+	public final ResponseEntity<ExceptionResponse> invalidInputException(Exception ex, WebRequest request) {
 		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getMessage(),
 				request.getDescription(false));
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);

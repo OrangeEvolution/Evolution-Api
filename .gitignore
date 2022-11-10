@@ -1,7 +1,11 @@
 HELP.md
+Dockerfile
+postgres/
+docker-compose.yml
 env.properties
 data.sql
 target/
+src/main/resources/db/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

@@ -1,5 +1,7 @@
 package br.com.fcamara.digital.orangeevolution.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.ResponseEntity.ok;
 
 import java.util.HashMap;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fcamara.digital.orangeevolution.data.vo.UserVO;
+import br.com.fcamara.digital.orangeevolution.exception.InvalidInputException;
 import br.com.fcamara.digital.orangeevolution.security.AccountCredentialsVO;
 import br.com.fcamara.digital.orangeevolution.security.jwt.JwtTokenProvider;
 import br.com.fcamara.digital.orangeevolution.services.UserServices;
@@ -54,14 +58,28 @@ public class AuthController {
 				throw new UsernameNotFoundException("UserName" + username + "not found!");
 			}
 			Map<Object, Object> model = new HashMap<>();
-			model.put("user_id", user.getId());
-			model.put("username", username);
 			model.put("token", token);
 			return ok(model);
 		} catch (AuthenticationException e) {
 			throw new BadCredentialsException("Invalidad username/password supplied!");
 		}
 
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Operation(summary = "Create new user")
+	@PostMapping(value = "/signup")
+	public ResponseEntity create(@RequestBody UserVO user) {
+		try {
+			UserVO userVO = userServices.create(user);
+			userVO.add(linkTo(methodOn(UserController.class).findById(userVO.getKey())).withSelfRel());
+			Map<Object, Object> model = new HashMap<>();
+			model.put("user", userVO);
+			return ok(model);
+
+		} catch (Exception e) {
+			throw new InvalidInputException(e.getMessage());
+		}
 	}
 
 }

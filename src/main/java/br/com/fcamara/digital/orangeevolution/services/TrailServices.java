@@ -1,9 +1,15 @@
 package br.com.fcamara.digital.orangeevolution.services;
 
+import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
 import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
+import br.com.fcamara.digital.orangeevolution.model.Category;
 import br.com.fcamara.digital.orangeevolution.model.Trail;
 import br.com.fcamara.digital.orangeevolution.repository.TrailRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,65 +17,77 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TrailServices {
-    @Autowired
-    TrailRepository repository;
+	@Autowired
+	TrailRepository repository;
 
-    private TrailVO convertToTrailVO(Trail trail) {
-        return toConvert(trail);
-    }
+	private TrailVO convertToTrailVO(Trail trail) {
+		return toConvert(trail);
+	}
 
-    private Trail toConvert(TrailVO trailVO) {
-        Trail trail = Trail.builder()
-                        .name(trailVO.getName())
-                        .description(trailVO.getDescription())
-                        .mounted_by(trailVO.getMounted_by())
-                        .build();
+	private Trail toConvert(TrailVO trailVO) {
+		List<Category> categories = new ArrayList<>();
+		for (CategoryVO categoryVO : trailVO.getCategories()) {
+			Category category = new Category(categoryVO.getKey(), categoryVO.getName());
+			categories.add(category);
+		}
+		Trail trail = Trail.builder().name(trailVO.getName()).description(trailVO.getDescription())
+				.mounted_by(trailVO.getMounted_by()).categories(categories).build();
 
-        return trail;
-    }
+		return trail;
+	}
 
-    private TrailVO toConvert(Trail trail) {
-        TrailVO trailVO = TrailVO.builder()
-                .key(trail.getId())
-                .name(trail.getName())
-                .description(trail.getDescription())
-                .mounted_by(trail.getMounted_by())
-                .build();
+	private TrailVO toConvert(Trail trail) {
+		List<CategoryVO> categories = new ArrayList<>();
+		for (Category category : trail.getCategories()) {
+			CategoryVO categoryVO = CategoryVO.builder().key(category.getId()).name(category.getName()).build();
+			categories.add(categoryVO);
+		}
+		TrailVO trailVO = TrailVO.builder().key(trail.getId()).name(trail.getName()).description(trail.getDescription())
+				.mounted_by(trail.getMounted_by()).categories(categories).build();
 
-        return trailVO;
-    }
+		return trailVO;
+	}
 
-    public TrailVO create(TrailVO trailVO) {
-        var entity = toConvert(trailVO);
-        trailVO = toConvert(repository.save(entity));
-        return trailVO;
-    }
+	public TrailVO create(TrailVO trailVO) {
+		var entity = toConvert(trailVO);
+		trailVO = toConvert(repository.save(entity));
+		return trailVO;
+	}
 
-    public TrailVO findById(Long id) {
-    	var teste = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
-        System.out.println(teste);
-    	return toConvert(teste);
-    }
+	public TrailVO findById(Long id) {
+		var teste = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
+		return toConvert(teste);
+	}
 
-    public Page<TrailVO> findAll(Pageable pageable) {
-        var page = repository.findAll(pageable);
-        return page.map(this::convertToTrailVO);
-    }
+	public Page<TrailVO> findAll(Pageable pageable) {
+		var page = repository.findAll(pageable);
+		return page.map(this::convertToTrailVO);
+	}
 
-    public void delete(Long id) {
-        Trail trail = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
-        repository.delete(trail);
-    }
+	public void delete(Long id) {
+		Trail trail = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
+		repository.delete(trail);
+	}
 
-    public TrailVO update(TrailVO trailVO) {
-        Trail trail = repository.findById(trailVO.getKey()).orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
+	public TrailVO update(TrailVO trailVO) {
+		Trail trail = repository.findById(trailVO.getKey())
+				.orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
 
-        trail.setName(trailVO.getName());
-        trail.setDescription(trailVO.getDescription());
-        trail.setMounted_by(trailVO.getMounted_by());
+		trail.setName(trailVO.getName());
+		trail.setDescription(trailVO.getDescription());
+		trail.setMounted_by(trailVO.getMounted_by());
 
-        repository.save(trail);
+		repository.save(trail);
 
-        return trailVO;
-    }
+		return trailVO;
+	}
+
+	public TrailVO addCategoryToTrail(TrailVO trail) {
+		var entity = repository.findById(trail.getKey())
+				.orElseThrow(() -> new ResourceNotFoundException("Not records found for thins ID"));
+		entity.setCategories(toConvert(trail).getCategories());
+		var vo = toConvert(repository.save(entity));
+		return vo;
+
+	}
 }
