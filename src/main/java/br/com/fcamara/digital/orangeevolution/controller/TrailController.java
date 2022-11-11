@@ -97,8 +97,8 @@ public class TrailController {
 	}
 
 	@SuppressWarnings("rawtypes")
-	@Operation(summary = "Add Trail to User")
-	@PatchMapping(value = "/addCategory/{idTrail}/{idCategory}")
+	@Operation(summary = "Add Category to Trail")
+	@PatchMapping(value = "/addcategory/{idTrail}/{idCategory}")
 	public ResponseEntity addCategoryToTrail(@PathVariable(value = "idTrail") Long idTrail,
 			@PathVariable(value = "idCategory") Long idCategory) {
 		var category = categoryServices.findById(idCategory);
@@ -108,11 +108,37 @@ public class TrailController {
 
 		if (!trail.getCategories().contains(category)) {
 			trail.getCategories().add(category);
-			trail = services.addCategoryToTrail(trail);
+			trail = services.updateCategoryToTrail(trail);
 			model.put("Trail categories:", trail.getCategories());
 
 		} else {
 			String message = "This category already belongs to this trail";
+			model.put("message", message);
+			return new ResponseEntity<>(model, HttpStatus.BAD_REQUEST);
+
+		}
+
+		return ok(model);
+
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Operation(summary = "Remove category from trail")
+	@PatchMapping(value = "/removecategory/{idTrail}/{idCategory}")
+	public ResponseEntity removeCategoryToTrail(@PathVariable(value = "idTrail") Long idTrail,
+			@PathVariable(value = "idCategory") Long idCategory) {
+		var category = categoryServices.findById(idCategory);
+		var trail = services.findById(idTrail);
+
+		Map<Object, Object> model = new HashMap<>();
+
+		if (trail.getCategories().contains(category)) {
+			trail.getCategories().remove(category);
+			trail = services.updateCategoryToTrail(trail);
+			model.put("Trail categories:", trail.getCategories());
+
+		} else {
+			String message = "This category does not belongs to this trail";
 			model.put("message", message);
 			return new ResponseEntity<>(model, HttpStatus.BAD_REQUEST);
 

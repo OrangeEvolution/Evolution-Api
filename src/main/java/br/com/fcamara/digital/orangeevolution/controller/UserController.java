@@ -84,7 +84,7 @@ public class UserController {
 
 	@SuppressWarnings("rawtypes")
 	@Operation(summary = "Add Trail to User")
-	@PatchMapping(value = "/addTrail/{idTrail}")
+	@PatchMapping(value = "/addtrail/{idTrail}")
 	public ResponseEntity addTrailToUser(@PathVariable(value = "idTrail") Long idTrail,
 			@AuthenticationPrincipal UserDetails userDetails) {
 		var user = services.findUserVO(userDetails.getUsername());
@@ -95,11 +95,38 @@ public class UserController {
 
 		if (!user.getTrails().contains(trail)) {
 			user.getTrails().add(trail);
-			userVO = services.addTrailToUser(user);
+			userVO = services.updateUserTrails(user);
 			model.put("User trails:", userVO.getTrails());
 
 		} else {
 			String message = "The user is already registered on this trail";
+			model.put("message", message);
+			return new ResponseEntity<>(model, HttpStatus.BAD_REQUEST);
+
+		}
+
+		return ok(model);
+
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Operation(summary = "Remove User Trail by Trail ID")
+	@PatchMapping(value = "/removetrail/{idTrail}")
+	public ResponseEntity removeTrailToUser(@PathVariable(value = "idTrail") Long idTrail,
+			@AuthenticationPrincipal UserDetails userDetails) {
+		var user = services.findUserVO(userDetails.getUsername());
+		var trail = trailServices.findById(idTrail);
+
+		Map<Object, Object> model = new HashMap<>();
+		UserVO userVO = new UserVO();
+
+		if (user.getTrails().contains(trail)) {
+			user.getTrails().remove(trail);
+			userVO = services.updateUserTrails(user);
+			model.put("User trails:", userVO.getTrails());
+
+		} else {
+			String message = "The user is not registered on this trail";
 			model.put("message", message);
 			return new ResponseEntity<>(model, HttpStatus.BAD_REQUEST);
 

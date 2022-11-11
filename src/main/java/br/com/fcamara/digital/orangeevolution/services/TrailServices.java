@@ -82,7 +82,7 @@ public class TrailServices {
 		return trailVO;
 	}
 
-	public TrailVO addCategoryToTrail(TrailVO trail) {
+	public TrailVO updateCategoryToTrail(TrailVO trail) {
 		var entity = repository.findById(trail.getKey())
 				.orElseThrow(() -> new ResourceNotFoundException("Not records found for thins ID"));
 		entity.setCategories(toConvert(trail).getCategories());

@@ -107,7 +107,8 @@ public class UserServices implements UserDetailsService {
 		var vo = toConvert(repository.save(entity));
 		return vo;
 	}
-	public UserVO addTrailToUser(UserVO user) {
+
+	public UserVO updateUserTrails(UserVO user) {
 		var entity = repository.findById(user.getKey())
 				.orElseThrow(() -> new ResourceNotFoundException("Not records found for thins ID"));
 		entity.setTrails(toConvert(user).getTrails());
@@ -128,6 +129,7 @@ public class UserServices implements UserDetailsService {
 	public User findUser(String username) {
 		return repository.findByUsername(username);
 	}
+
 	public UserVO findUserVO(String username) {
 		return toConvert(repository.findByUsername(username));
 	}
