@@ -4,7 +4,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fcamara.digital.orangeevolution.data.vo.CategoryContentVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.TrailAndCategoriesContentsVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
 import br.com.fcamara.digital.orangeevolution.services.CategoryServices;
+import br.com.fcamara.digital.orangeevolution.services.ContentServices;
 import br.com.fcamara.digital.orangeevolution.services.TrailServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +47,8 @@ public class TrailController {
 	private TrailServices services;
 	@Autowired
 	private CategoryServices categoryServices;
+	@Autowired
+	private ContentServices contentServices;
 
 	@Operation(summary = "Create new trail")
 	@PostMapping
@@ -113,5 +120,24 @@ public class TrailController {
 
 		return ok(model);
 
+	}
+
+	@Operation(summary = "Find the trail by ID, its categories and contents")
+	@GetMapping(value = "/findfull/{id}")
+	public TrailAndCategoriesContentsVO findFullTrailById(@PathVariable(value = "id") Long id) {
+		TrailVO trailVO = services.findById(id);
+		List<CategoryContentVO> categoryContents = new ArrayList<>();
+		for (var category : trailVO.getCategories()) {
+			CategoryContentVO ccVO = new CategoryContentVO();
+			ccVO.setId(category.getKey());
+			ccVO.setName(category.getName());
+			var contents = contentServices.findAllByCategory(category);
+			ccVO.setContents(contents);
+			categoryContents.add(ccVO);
+
+		}
+		TrailAndCategoriesContentsVO vo = new TrailAndCategoriesContentsVO(trailVO.getKey(),trailVO.getName(),trailVO.getDescription(),trailVO.getMounted_by(),categoryContents);
+
+		return vo;
 	}
 }

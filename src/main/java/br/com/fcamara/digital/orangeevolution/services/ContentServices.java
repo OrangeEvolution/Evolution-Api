@@ -1,10 +1,14 @@
 package br.com.fcamara.digital.orangeevolution.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentVO;
 import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
 import br.com.fcamara.digital.orangeevolution.model.Category;
@@ -33,6 +37,15 @@ public class ContentServices {
 	public Page<ContentVO> findAll(Pageable pageable) {
 		var page = repository.findAll(pageable);
 		return page.map(this::convertToContentVO);
+	}
+
+	public List<ContentVO> findAllByCategory(CategoryVO categoryVO) {
+		var contents = repository.findAll(categoryVO.getKey());
+		List<ContentVO> contentsVO = new ArrayList<>();
+		for (var content : contents) {
+			contentsVO.add(toConvert(content));
+		}
+		return contentsVO;
 	}
 
 	public void delete(Long id) {
