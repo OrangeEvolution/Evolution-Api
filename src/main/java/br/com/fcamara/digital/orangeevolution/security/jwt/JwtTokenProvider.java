@@ -28,7 +28,7 @@ public class JwtTokenProvider {
 	@Value("${security.jwt.token.secret-key:}")
 	private String secretKey;
 
-	private long validityInMilliseconds=3600000;
+	private long validityInMilliseconds = 3600000;
 
 	@Autowired
 	private UserDetailsService userDetailsService;
@@ -38,10 +38,11 @@ public class JwtTokenProvider {
 		secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
 	}
 
-	public String createToken(String username, List<String> roles) {
+	public String createToken(String username, List<String> roles, Long id, String fullName) {
 		Claims claims = Jwts.claims().setSubject(username);
 		claims.put("roles", roles);
-
+		claims.put("fullName", fullName);
+		claims.put("user_id", id);
 		Date now = new Date();
 		Date validity = new Date(now.getTime() + validityInMilliseconds);
 

@@ -53,7 +53,7 @@ public class AuthController {
 			var user = userServices.findUser(username);
 			var token = "";
 			if (user != null) {
-				token = tokenProvider.createToken(username, user.getRoles());
+				token = tokenProvider.createToken(username, user.getRoles(), user.getId(),user.getFullName());
 			} else {
 				throw new UsernameNotFoundException("UserName" + username + "not found!");
 			}
