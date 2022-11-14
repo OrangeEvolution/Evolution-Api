@@ -1,8 +1,9 @@
 package br.com.fcamara.digital.orangeevolution.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentProgressVO;
@@ -17,10 +18,6 @@ public class ContentProgressServices {
 
 	@Autowired
 	ContentProgressRepository repository;
-
-	private ContentProgressVO convertToContentProgressVO(ContentProgress type) {
-		return toConvert(type);
-	}
 
 	private ContentProgress toConvert(ContentProgressVO progressVO) {
 		Content content = new Content();
@@ -48,9 +45,18 @@ public class ContentProgressServices {
 				repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Content Progress not found")));
 	}
 
-	public Page<ContentProgressVO> findAll(Pageable pageable) {
-		var page = repository.findAll(pageable);
-		return page.map(this::convertToContentProgressVO);
+	public ContentProgressVO findByContentId(Long idContent, Long idUser) {
+		return toConvert(repository.findByContentId(idContent, idUser));
+	}
+
+	public List<ContentProgressVO> findAll(Long idUser) {
+		var list = repository.findAll(idUser);
+		List<ContentProgressVO> progress = new ArrayList<>();
+		for (ContentProgress contentProgress : list) {
+			progress.add(toConvert(contentProgress));
+		}
+		return progress;
+
 	}
 
 	public void delete(Long id) {

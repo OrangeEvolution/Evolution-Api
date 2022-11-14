@@ -18,6 +18,8 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,12 +31,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fcamara.digital.orangeevolution.data.vo.CategoryAndContentAndProgressVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.CategoryContentVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.ContentAndProgressVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.ContentVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.TrailAndCategoriesContentsAndProgressVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.TrailAndCategoriesContentsVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
 import br.com.fcamara.digital.orangeevolution.services.CategoryServices;
+import br.com.fcamara.digital.orangeevolution.services.ContentProgressServices;
 import br.com.fcamara.digital.orangeevolution.services.ContentServices;
 import br.com.fcamara.digital.orangeevolution.services.TrailServices;
+import br.com.fcamara.digital.orangeevolution.services.UserServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -49,6 +57,10 @@ public class TrailController {
 	private CategoryServices categoryServices;
 	@Autowired
 	private ContentServices contentServices;
+	@Autowired
+	private ContentProgressServices progressServices;
+	@Autowired
+	private UserServices userServices;
 
 	@Operation(summary = "Create new trail")
 	@PostMapping
@@ -121,7 +133,7 @@ public class TrailController {
 		return ok(model);
 
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Operation(summary = "Remove category from trail")
 	@PatchMapping(value = "/removecategory/{idTrail}/{idCategory}")
@@ -162,8 +174,48 @@ public class TrailController {
 			categoryContents.add(ccVO);
 
 		}
-		TrailAndCategoriesContentsVO vo = new TrailAndCategoriesContentsVO(trailVO.getKey(),trailVO.getName(),trailVO.getDescription(),trailVO.getMounted_by(),categoryContents);
+		TrailAndCategoriesContentsVO vo = new TrailAndCategoriesContentsVO(trailVO.getKey(), trailVO.getName(),
+				trailVO.getDescription(), trailVO.getMounted_by(), categoryContents);
 
 		return vo;
+	}
+
+	@Operation(summary = "Find the trail by ID, its categories and contents")
+	@GetMapping(value = "/findfullProgress/{id}")
+	public TrailAndCategoriesContentsAndProgressVO findFullTrailByIdAndProgress(@PathVariable(value = "id") Long id,
+			@AuthenticationPrincipal UserDetails userDetails) {
+		var user = userServices.findUser(userDetails.getUsername());
+		var trailVO = services.findById(id);
+		List<CategoryAndContentAndProgressVO> ccpVOlist = new ArrayList<>();
+
+		for (var category : trailVO.getCategories()) {
+			CategoryAndContentAndProgressVO ccpVO = new CategoryAndContentAndProgressVO();
+			ccpVO.setId(category.getKey());
+			ccpVO.setName(category.getName());
+			var contents = contentServices.findAllByCategory(category);
+			List<ContentAndProgressVO> listContentAndProgress = new ArrayList<>();
+			for (ContentVO i : contents) {
+
+				var contentAndProgress = new ContentAndProgressVO();
+				contentAndProgress.setKey(i.getKey());
+				contentAndProgress.setCategory(i.getCategory());
+				contentAndProgress.setContentType(i.getContentType());
+				contentAndProgress.setDescription(i.getDescription());
+				contentAndProgress.setDurationInMinutes(i.getDurationInMinutes());
+				contentAndProgress.setLink(i.getLink());
+				contentAndProgress.setPartner(i.getPartner());
+				contentAndProgress
+						.setProgressEnum(progressServices.findByContentId(i.getKey(), user.getId()).getStatus());
+				listContentAndProgress.add(contentAndProgress);
+			}
+			ccpVO.setContents(listContentAndProgress);
+			ccpVOlist.add(ccpVO);
+
+		}
+		TrailAndCategoriesContentsAndProgressVO vo = new TrailAndCategoriesContentsAndProgressVO(trailVO.getKey(),
+				trailVO.getName(), trailVO.getDescription(), trailVO.getMounted_by(), ccpVOlist);
+
+		return vo;
+
 	}
 }
