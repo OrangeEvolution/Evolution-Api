@@ -29,7 +29,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fcamara.digital.orangeevolution.data.model.enums.StatusProgressEnum;
+import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.ContentProgressVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.ContentVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.UserVO;
+import br.com.fcamara.digital.orangeevolution.services.ContentProgressServices;
+import br.com.fcamara.digital.orangeevolution.services.ContentServices;
 import br.com.fcamara.digital.orangeevolution.services.TrailServices;
 import br.com.fcamara.digital.orangeevolution.services.UserServices;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +49,10 @@ public class UserController {
 	private UserServices services;
 	@Autowired
 	private TrailServices trailServices;
+	@Autowired
+	private ContentProgressServices progressServices;
+	@Autowired
+	private ContentServices contentServices;
 
 	@Operation(summary = "Find a specific by you ID")
 	@GetMapping(value = "/{id}")
@@ -96,6 +106,16 @@ public class UserController {
 		if (!user.getTrails().contains(trail)) {
 			user.getTrails().add(trail);
 			userVO = services.updateUserTrails(user);
+			for (CategoryVO categoryVO : trail.getCategories()) {
+				var contents = contentServices.findAllByCategory(categoryVO);
+				for (ContentVO contentVO : contents) {
+					ContentProgressVO contentProgressVO = ContentProgressVO.builder()
+							.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey()).content(contentVO.getKey())
+							.build();
+					progressServices.create(contentProgressVO);
+				}
+
+			}
 			model.put("User trails:", userVO.getTrails());
 
 		} else {
