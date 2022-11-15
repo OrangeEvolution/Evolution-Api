@@ -47,7 +47,6 @@ public class ContentProgressServices {
 
 	public ContentProgressVO findByContentId(Long idContent, Long idUser) {
 		var res = repository.findByContentId(idContent, idUser).orElse(null);
-		System.out.println(res);
 		if (res==null) {
 			return null;
 		}

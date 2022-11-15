@@ -62,13 +62,11 @@ public class ContentController {
 				for (var user : users) {
 					if (!listnotrepeat.contains(user)) {
 						listnotrepeat.add(user);
-						System.out.println(listnotrepeat);
 					}
 				}
 
 				for (var user : listnotrepeat) {
 					if (!controle.contains(user.getKey())) {
-						System.out.println(controle);
 						controle.add(user.getKey());
 
 						ContentProgressVO progress = new ContentProgressVO();
