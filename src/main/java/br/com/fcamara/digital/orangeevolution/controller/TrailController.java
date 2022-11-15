@@ -31,9 +31,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fcamara.digital.orangeevolution.data.model.enums.StatusProgressEnum;
 import br.com.fcamara.digital.orangeevolution.data.vo.CategoryAndContentAndProgressVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.CategoryContentVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentAndProgressVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.ContentProgressVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.TrailAndCategoriesContentsAndProgressVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.TrailAndCategoriesContentsVO;
@@ -118,10 +120,21 @@ public class TrailController {
 
 		Map<Object, Object> model = new HashMap<>();
 
+		var users = userServices.findUserByTrailId(trail.getKey());
+		var contents = contentServices.findAllByCategory(category);
+
 		if (!trail.getCategories().contains(category)) {
 			trail.getCategories().add(category);
 			trail = services.updateCategoryToTrail(trail);
 			model.put("Trail categories:", trail.getCategories());
+			for (var user : users) {
+				for (ContentVO contentVO : contents) {
+					ContentProgressVO contentProgressVO = ContentProgressVO.builder()
+							.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey()).content(contentVO.getKey())
+							.build();
+					progressServices.create(contentProgressVO);
+				}
+			}
 
 		} else {
 			String message = "This category already belongs to this trail";

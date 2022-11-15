@@ -22,8 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.fcamara.digital.orangeevolution.data.model.enums.StatusProgressEnum;
+import br.com.fcamara.digital.orangeevolution.data.vo.ContentProgressVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentVO;
+import br.com.fcamara.digital.orangeevolution.services.ContentProgressServices;
 import br.com.fcamara.digital.orangeevolution.services.ContentServices;
+import br.com.fcamara.digital.orangeevolution.services.TrailServices;
+import br.com.fcamara.digital.orangeevolution.services.UserServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -33,11 +38,29 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ContentController {
 	@Autowired
 	private ContentServices services;
+	@Autowired
+	private ContentProgressServices progressServices;
+	@Autowired
+	private UserServices userServices;
+	@Autowired
+	private TrailServices trailServices;
 
 	@Operation(summary = "Create new content")
 	@PostMapping
 	public ContentVO create(@RequestBody ContentVO content) {
 		ContentVO contentVO = services.create(content);
+		var trails = trailServices.findTrailsByCategory(content.getCategory());
+		if (contentVO != null) {
+			for (var trail : trails) {
+				var users = userServices.findUserByTrailId(trail.getKey());
+				for (var user : users) {
+					ContentProgressVO progress = ContentProgressVO.builder().content(contentVO.getKey())
+							.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey()).build();
+					progressServices.create(progress);
+				}
+			}
+		}
+
 		contentVO.add(linkTo(methodOn(ContentController.class).findById(contentVO.getKey())).withSelfRel());
 		return contentVO;
 	}

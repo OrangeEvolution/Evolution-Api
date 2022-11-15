@@ -1,12 +1,5 @@
 package br.com.fcamara.digital.orangeevolution.services;
 
-import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
-import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
-import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
-import br.com.fcamara.digital.orangeevolution.model.Category;
-import br.com.fcamara.digital.orangeevolution.model.Trail;
-import br.com.fcamara.digital.orangeevolution.repository.TrailRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import br.com.fcamara.digital.orangeevolution.data.vo.CategoryVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.TrailVO;
+import br.com.fcamara.digital.orangeevolution.exception.ResourceNotFoundException;
+import br.com.fcamara.digital.orangeevolution.model.Category;
+import br.com.fcamara.digital.orangeevolution.model.Trail;
+import br.com.fcamara.digital.orangeevolution.repository.TrailRepository;
 
 @Service
 public class TrailServices {
@@ -57,6 +57,16 @@ public class TrailServices {
 	public TrailVO findById(Long id) {
 		var teste = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Trail not found"));
 		return toConvert(teste);
+	}
+
+	public List<TrailVO> findTrailsByCategory(Long idCategory) {
+		var trails = repository.findTrailsByCategory(idCategory);
+		List<TrailVO> trailsVO = new ArrayList<>();
+		for (var trail : trails) {
+			trailsVO.add(toConvert(trail));
+		}
+		return trailsVO;
+
 	}
 
 	public Page<TrailVO> findAll(Pageable pageable) {

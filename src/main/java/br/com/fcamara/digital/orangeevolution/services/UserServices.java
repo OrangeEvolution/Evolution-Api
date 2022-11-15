@@ -89,6 +89,16 @@ public class UserServices implements UserDetailsService {
 				.orElseThrow(() -> new ResourceNotFoundException("Not records found for thins ID")));
 	}
 
+	public List<UserVO> findUserByTrailId(Long idTrail) {
+		var users = repository.findUserByTrailId(idTrail);
+		List<UserVO> usersVO = new ArrayList<>();
+		for (var user : users) {
+			usersVO.add(toConvert(user));
+		}
+		return usersVO;
+
+	}
+
 	public Page<UserVO> findAll(Pageable pageable) {
 		var page = repository.findAll(pageable);
 		return page.map(this::convertToUserVO);
