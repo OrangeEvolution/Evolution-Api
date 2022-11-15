@@ -32,5 +32,6 @@ public class ContentAndProgressVO extends RepresentationModel<ContentAndProgress
 	private Long category;
 	private Long contentType;
 	private StatusProgressEnum progressEnum;
+	private Long progress;
 
 }

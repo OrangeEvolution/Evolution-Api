@@ -3,6 +3,9 @@ package br.com.fcamara.digital.orangeevolution.controller;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.fcamara.digital.orangeevolution.data.model.enums.StatusProgressEnum;
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentProgressVO;
 import br.com.fcamara.digital.orangeevolution.data.vo.ContentVO;
+import br.com.fcamara.digital.orangeevolution.data.vo.UserVO;
 import br.com.fcamara.digital.orangeevolution.services.ContentProgressServices;
 import br.com.fcamara.digital.orangeevolution.services.ContentServices;
 import br.com.fcamara.digital.orangeevolution.services.TrailServices;
@@ -49,14 +53,17 @@ public class ContentController {
 	@PostMapping
 	public ContentVO create(@RequestBody ContentVO content) {
 		ContentVO contentVO = services.create(content);
-		var trails = trailServices.findTrailsByCategory(content.getCategory());
+		var trails = trailServices.findTrailsByCategory(contentVO.getCategory());
 		if (contentVO != null) {
 			for (var trail : trails) {
 				var users = userServices.findUserByTrailId(trail.getKey());
-				for (var user : users) {
+				
+				List<UserVO>listnotrepeat=users.stream().distinct().collect(Collectors.toList());
+				for (var user : listnotrepeat) {
 					ContentProgressVO progress = ContentProgressVO.builder().content(contentVO.getKey())
 							.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey()).build();
 					progressServices.create(progress);
+
 				}
 			}
 		}

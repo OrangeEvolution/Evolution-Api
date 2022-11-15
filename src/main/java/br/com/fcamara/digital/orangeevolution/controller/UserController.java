@@ -109,10 +109,12 @@ public class UserController {
 			for (CategoryVO categoryVO : trail.getCategories()) {
 				var contents = contentServices.findAllByCategory(categoryVO);
 				for (ContentVO contentVO : contents) {
-					ContentProgressVO contentProgressVO = ContentProgressVO.builder()
-							.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey()).content(contentVO.getKey())
-							.build();
-					progressServices.create(contentProgressVO);
+					if (progressServices.findByContentId(contentVO.getKey(), user.getKey()) == null) {
+						ContentProgressVO contentProgressVO = ContentProgressVO.builder()
+								.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey())
+								.content(contentVO.getKey()).build();
+						progressServices.create(contentProgressVO);
+					}
 				}
 
 			}

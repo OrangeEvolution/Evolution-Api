@@ -129,10 +129,13 @@ public class TrailController {
 			model.put("Trail categories:", trail.getCategories());
 			for (var user : users) {
 				for (ContentVO contentVO : contents) {
-					ContentProgressVO contentProgressVO = ContentProgressVO.builder()
-							.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey()).content(contentVO.getKey())
-							.build();
-					progressServices.create(contentProgressVO);
+					if (progressServices.findByContentId(contentVO.getKey(), user.getKey()) == null) {
+
+						ContentProgressVO contentProgressVO = ContentProgressVO.builder()
+								.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey())
+								.content(contentVO.getKey()).build();
+						progressServices.create(contentProgressVO);
+					}
 				}
 			}
 
@@ -217,8 +220,9 @@ public class TrailController {
 				contentAndProgress.setDurationInMinutes(i.getDurationInMinutes());
 				contentAndProgress.setLink(i.getLink());
 				contentAndProgress.setPartner(i.getPartner());
-				contentAndProgress
-						.setProgressEnum(progressServices.findByContentId(i.getKey(), user.getId()).getStatus());
+				var pro = progressServices.findByContentId(i.getKey(), user.getId());
+				contentAndProgress.setProgressEnum(pro.getStatus());
+				contentAndProgress.setProgress(pro.getKey());
 				listContentAndProgress.add(contentAndProgress);
 			}
 			ccpVO.setContents(listContentAndProgress);
