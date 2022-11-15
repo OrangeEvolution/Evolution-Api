@@ -99,21 +99,33 @@ public class UserController {
 			@AuthenticationPrincipal UserDetails userDetails) {
 		var user = services.findUserVO(userDetails.getUsername());
 		var trail = trailServices.findById(idTrail);
+		boolean primaryAcess = false;
+		if (user.getTrails().isEmpty()) {
+			primaryAcess = true;
+		}
 
 		Map<Object, Object> model = new HashMap<>();
-		UserVO userVO = new UserVO();
 
-		if (!user.getTrails().contains(trail)) {
+		if (!user.getTrails().contains(trail) || !primaryAcess) {
 			user.getTrails().add(trail);
-			userVO = services.updateUserTrails(user);
+			var userVO = services.updateUserTrails(user);
 			for (CategoryVO categoryVO : trail.getCategories()) {
 				var contents = contentServices.findAllByCategory(categoryVO);
 				for (ContentVO contentVO : contents) {
-					if (progressServices.findByContentId(contentVO.getKey(), user.getKey()) == null) {
+					if (primaryAcess) {
 						ContentProgressVO contentProgressVO = ContentProgressVO.builder()
-								.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey())
+								.status(StatusProgressEnum.NOT_COMPLETED).user(userVO.getKey())
 								.content(contentVO.getKey()).build();
 						progressServices.create(contentProgressVO);
+					} else {
+						if (progressServices.findByContentId(contentVO.getKey(), userVO.getKey()) == null) {
+
+							System.out.println("entou aqui4");
+							ContentProgressVO contentProgressVO = ContentProgressVO.builder()
+									.status(StatusProgressEnum.NOT_COMPLETED).user(userVO.getKey())
+									.content(contentVO.getKey()).build();
+							progressServices.create(contentProgressVO);
+						}
 					}
 				}
 
