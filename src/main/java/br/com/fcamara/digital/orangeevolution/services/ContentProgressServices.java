@@ -46,7 +46,12 @@ public class ContentProgressServices {
 	}
 
 	public ContentProgressVO findByContentId(Long idContent, Long idUser) {
-		return toConvert(repository.findByContentId(idContent, idUser));
+		var res = repository.findByContentId(idContent, idUser).orElse(null);
+		System.out.println(res);
+		if (res==null) {
+			return null;
+		}
+		return toConvert(res);
 	}
 
 	public List<ContentProgressVO> findAll(Long idUser) {

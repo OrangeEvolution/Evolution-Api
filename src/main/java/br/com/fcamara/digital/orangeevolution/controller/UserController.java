@@ -109,18 +109,24 @@ public class UserController {
 		if (!user.getTrails().contains(trail) || !primaryAcess) {
 			user.getTrails().add(trail);
 			var userVO = services.updateUserTrails(user);
+			System.out.println("Adicionou Trilha");
 			for (CategoryVO categoryVO : trail.getCategories()) {
 				var contents = contentServices.findAllByCategory(categoryVO);
+				System.out.println("Buscou os contents da categoria");
 				for (ContentVO contentVO : contents) {
+					System.out.println("Content: "+contentVO.getDescription());
 					if (primaryAcess) {
+						System.out.println("entrou no if de primeiro acesso");
 						ContentProgressVO contentProgressVO = ContentProgressVO.builder()
 								.status(StatusProgressEnum.NOT_COMPLETED).user(userVO.getKey())
 								.content(contentVO.getKey()).build();
 						progressServices.create(contentProgressVO);
 					} else {
-						if (progressServices.findByContentId(contentVO.getKey(), userVO.getKey()) == null) {
-
-							System.out.println("entou aqui4");
+						System.out.println("Não entrou no if de primeiro acesso");
+						var erro = progressServices.findByContentId(contentVO.getKey(), userVO.getKey());
+						System.out.println(erro);
+						if (erro==null) {
+							System.out.println("Usuário nao tem esse progress");
 							ContentProgressVO contentProgressVO = ContentProgressVO.builder()
 									.status(StatusProgressEnum.NOT_COMPLETED).user(userVO.getKey())
 									.content(contentVO.getKey()).build();
