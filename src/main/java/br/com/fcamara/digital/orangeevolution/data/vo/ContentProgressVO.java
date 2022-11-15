@@ -7,11 +7,15 @@ import org.springframework.hateoas.RepresentationModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import br.com.fcamara.digital.orangeevolution.data.model.enums.StatusProgressEnum;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ContentProgressVO extends RepresentationModel<ContentProgressVO> implements Serializable {
 
 	/**

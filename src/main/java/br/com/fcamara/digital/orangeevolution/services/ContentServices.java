@@ -24,7 +24,6 @@ public class ContentServices {
 
 	public ContentVO create(ContentVO contentVO) {
 		Content content = toConvert(contentVO);
-		System.out.println(content);
 		contentVO = toConvert(repository.save(content));
 
 		return contentVO;

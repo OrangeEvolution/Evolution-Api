@@ -3,8 +3,8 @@ package br.com.fcamara.digital.orangeevolution.controller;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -55,15 +55,28 @@ public class ContentController {
 		ContentVO contentVO = services.create(content);
 		var trails = trailServices.findTrailsByCategory(contentVO.getCategory());
 		if (contentVO != null) {
+			List<UserVO> listnotrepeat = new ArrayList<>();
+			List<Long> controle = new ArrayList<>();
 			for (var trail : trails) {
 				var users = userServices.findUserByTrailId(trail.getKey());
-				
-				List<UserVO>listnotrepeat=users.stream().distinct().collect(Collectors.toList());
-				for (var user : listnotrepeat) {
-					ContentProgressVO progress = ContentProgressVO.builder().content(contentVO.getKey())
-							.status(StatusProgressEnum.NOT_COMPLETED).user(user.getKey()).build();
-					progressServices.create(progress);
+				for (var user : users) {
+					if (!listnotrepeat.contains(user)) {
+						listnotrepeat.add(user);
+						System.out.println(listnotrepeat);
+					}
+				}
 
+				for (var user : listnotrepeat) {
+					if (!controle.contains(user.getKey())) {
+						System.out.println(controle);
+						controle.add(user.getKey());
+
+						ContentProgressVO progress = new ContentProgressVO();
+						progress.setContent(contentVO.getKey());
+						progress.setStatus(StatusProgressEnum.NOT_COMPLETED);
+						progress.setUser(user.getKey());
+						progressServices.create(progress);
+					}
 				}
 			}
 		}
